@@ -22,17 +22,31 @@ def add_bg_from_local(image_file):
         encoded_string = base64.b64encode(image_file.read())
     st.markdown(
     f"""
-    <style>
+   <style>
     .stApp {{
         background-image: url(data:image/webp;base64,{encoded_string.decode()});
         background-size: cover;
-        background-color: #0a0a1e; /* Bleu nuit */
-        color: #00d4ff; /* Bleu néon */
+        background-color: #f5e6dc; /* Beige pastel doux */
+        color: #d17842; /* Brun orangé inspiré des chaussures et vêtements */
     }}
+    
     .stMarkdown, .stTextInput, .stButton>button {{
-        color: #00d4ff;
+        color: #d17842;
+        font-family: 'Poppins', sans-serif;
     }}
-    </style>
+    
+    .stButton>button {{
+        background-color: #ffab73; /* Orange doux */
+        border-radius: 10px;
+        border: none;
+        padding: 8px 15px;
+        transition: 0.3s ease-in-out;
+    }}
+    
+    .stButton>button:hover {{
+        background-color: #e67e22; /* Orange plus vif au survol */
+    }}
+</style>
     """,
     unsafe_allow_html=True
 )
@@ -141,8 +155,6 @@ def local_css(css):
 
 
 
-# Appeler la fonction pour appliquer le CSS
-local_css(couleur_css)
 
 if Category == "Scrape les données avec beautifulSoup":
     Vetements_enfants = scrape_vetements_data(Pages)
