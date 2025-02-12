@@ -3,8 +3,6 @@ import pandas as pd
 from bs4 import BeautifulSoup as bs
 from requests import get
 import base64
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
 import streamlit.components.v1 as components
 
@@ -55,7 +53,7 @@ def load(dataframe, title, key, key1):
 
     if st.button(title, key=key1):
         st.subheader("Dimension")
-        st.write(f"Dimension des données: {dataframe.shape[0]} rows and {dataframe.shape[1]} columns.")
+        st.write(f"Dimension des données: {dataframe.shape[0]} lignes et {dataframe.shape[1]} colonnes.")
         st.dataframe(dataframe)
 
         csv = convert_df(dataframe)
@@ -91,8 +89,8 @@ def scrape_vetements_data(plusieurs_page):
                     "Image_lien": Image_lien,  
                 }
                 donne.append(dic)
-            except:
-                pass
+            except Exception as e:
+                st.error(f"Erreur lors du scraping des vêtements: {e}")
         Df = pd.DataFrame(donne)
         DF = pd.concat([DF, Df], axis=0).reset_index(drop=True)
     return DF
@@ -120,8 +118,8 @@ def scrape_chaussures_data(plusieurs_page):
                     "Image lien": Image_lien,
                 }
                 donne.append(dic)
-            except:
-                pass
+            except Exception as e:
+                st.error(f"Erreur lors du scraping des chaussures: {e}")
         DF1 = pd.DataFrame(donne)
         df = pd.concat([df, DF1], axis=0).reset_index(drop=True)
     return df
@@ -129,7 +127,7 @@ def scrape_chaussures_data(plusieurs_page):
 # PARTIE 4
 st.sidebar.header("Saisie de l'utilisateur")
 Pages = st.sidebar.selectbox('Pages', list(np.arange(2, 30)))
-Category = st.sidebar.selectbox("Options", ["Scrape les données avec beautifulSoup", "Scarper les données avec web Scarper", "Formulaire avec koblox", "Formulaire avec Google Forms"])
+Category = st.sidebar.selectbox("Options", ["Scrape les données avec beautifulSoup", "Scraper les données avec web Scraper", "Formulaire avec koblox", "Formulaire avec Google Forms"])
 
 # Fonction pour injecter du CSS personnalisé
 def local_css(css):
@@ -176,10 +174,12 @@ elif Category == "Scraper les données avec web Scraper":
         load(Vetements, "Données sur les vetements", '1', '110')
         load(Chaussures, "Données sur les chaussures", '2', '111')
     except FileNotFoundError as e:
-        print(f"Erreur: Fichier non trouvé - {e}")
+        st.error(f"Erreur: Fichier non trouvé - {e}")
     except Exception as e:
-        print(f"Erreur inattendue: {e}")
-components.html("""
-<iframe src="https://kf.kobotoolbox.org/#/forms/aHfeV2YQC7YodLce47Bav5" width="800" height="1100"></iframe>
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLScuuEKdEs1FmIeYDq3TrUT2TiNqc1OIT7GPG0hCa2fx52_q_A/viewform?usp=preview" width="800" height="1100"></iframe>
-""")
+        st.error(f"Erreur inattendue: {e}")
+
+elif Category == "Formulaire avec koblox":
+    components.iframe("https://kf.kobotoolbox.org/#/forms/aHfeV2YQC7YodLce47Bav5", width=800, height=1100)
+
+elif Category == "Formulaire avec Google Forms":
+    components.iframe("https://docs.google.com/forms/d/e/1FAIpQLScuuEKdEs1FmIeYDq3TrUT2TiNqc1OIT7GPG0hCa2fx52_q_A/viewform?usp=preview", width=800, height=1100)
