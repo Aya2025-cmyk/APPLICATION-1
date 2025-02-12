@@ -1,237 +1,193 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "dbc71fa9-e242-4ae0-8070-891c78e35ad9",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "import streamlit as st\n",
-    "import pandas as pd\n",
-    "from bs4 import BeautifulSoup as bs\n",
-    "from requests import get\n",
-    "import base64\n",
-    "import matplotlib.pyplot as plt\n",
-    "import seaborn as sns\n",
-    "import numpy as np\n",
-    "import streamlit as st\n",
-    "import streamlit.components.v1 as components\n",
-    "\n",
-    "\n",
-    "\n",
-    "\n",
-    "st.markdown(\"<h1 style='text-align: center; color: black;'>SCARPER LES DONNEES</h1>\", unsafe_allow_html=True)\n",
-    "\n",
-    "st.markdown(\"\"\"\n",
-    "Cette application effectue le webscraping des données de Coin Afrique sur plusieurs pages. \n",
-    "Et nous pouvons également télécharger les données extraites de l'application directement sans les extraire. \n",
-    "* **Bibliothèques Python :** base64, pandas, streamlit, requests, bs4 \n",
-    "* **Source des données :** https://sn.coinafrique.com/categorie/vetements-enfants --https://sn.coinafrique.com/categorie/chaussures-enfants.\n",
-    "\"\"\") \n",
-    "\n",
-    "                                                      #PARTIE 1\n",
-    "          # Fontion du background\n",
-    "def add_bg_from_local(image_file):\n",
-    "    with open(image_file, \"rb\") as image_file:\n",
-    "        encoded_string = base64.b64encode(image_file.read())\n",
-    "    st.markdown(\n",
-    "    f\"\"\"\n",
-    "    <style>\n",
-    "    .stApp {{\n",
-    "        background-image: url(data:image/{\"webp\"};base64,{encoded_string.decode()});\n",
-    "        background-size: cover\n",
-    "    }}\n",
-    "    </style>\n",
-    "    \"\"\",\n",
-    "    unsafe_allow_html=True\n",
-    "    )\n",
-    "         # fond d'ecran de l'application\n",
-    "add_bg_from_local(\"C:\\Users\\user\\Desktop\\Projet\\Projet-App\\Fondecran.webp\")\n",
-    "         # Scarper les données d\n",
-    "@st.cache_data\n",
-    "\n",
-    "def convert_df(df):\n",
-    "    # IMPORTANT: Cache the conversion to prevent computation on every rerun\n",
-    "    return df.to_csv().encode('utf-8')\n",
-    "\n",
-    "def load(dataframe, title, key, key1) :\n",
-    "    st.markdown(\"\"\"\n",
-    "    <style>\n",
-    "    div.stButton {text-align:center}\n",
-    "    </style>\"\"\", unsafe_allow_html=True)\n",
-    "\n",
-    "    if st.button(title,key1):\n",
-    "        # st.header(title)\n",
-    "\n",
-    "        st.subheader(\"Dimension\")\n",
-    "        st.write(\"Dimension des données:\" + str(dataframe.shape[0]) + \" rows and \" + str(dataframe.shape[1]) + \" columns.\")\n",
-    "        st.dataframe(dataframe)\n",
-    "\n",
-    "        csv = convert_df(dataframe)\n",
-    "\n",
-    "        st.download_button(\n",
-    "            label=\"Télécharger les données en CSV\",\n",
-    "            data=csv,\n",
-    "            file_name='Données.csv',\n",
-    "            mime='text/csv',\n",
-    "            key = key)\n",
-    "\n",
-    "def local_css(file_name):\n",
-    "    with open(file_name) as f:\n",
-    "        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)\n",
-    "\n",
-    "                                                             # PARTIE 2 \n",
-    "        \n",
-    "                 # Fonction de scraping des données vetements des enfants\n",
-    "def scrape_vetements_data(plusieurs_page):\n",
-    "    DF=pd.DataFrame()\n",
-    "    for index in range(1, int(plusieurs_page)+1): \n",
-    "        url=f'https://sn.coinafrique.com/categorie/vetements-enfants?page={index}'\n",
-    "        res= get(url)\n",
-    "        soup= bs(res.text, 'html.parser')\n",
-    "        containers= soup.find_all('div', class_=\"col s6 m4 l3\")\n",
-    "        donne = []\n",
-    "for container in containers :\n",
-    "    try :\n",
-    "         type_habits=container.find(\"p\", class_=\"ad__card-description\").text.strip()\n",
-    "         Prix=container.find(\"p\", class_=\"ad__card-price\").text.strip().replace(\"CFA\", \"\" )\n",
-    "         Adresse=container.find(\"p\", class_=\"ad__card-location\").text.strip().replace(\"location_on\", \"\")\n",
-    "         Image_lien=container.find(\"img\",class_=\"ad__card-img\")[\"src\"]\n",
-    "        \n",
-    "         dic = {\n",
-    "                \"Type habits\": type_habits,\n",
-    "                \"Prix\": Prix,\n",
-    "                \"Adresse\": Adresse,\n",
-    "                \"Image_lien\": Image_lien,   \n",
-    "            }\n",
-    "         donne.append(dic)\n",
-    "    except :\n",
-    "           pass\n",
-    "Df=pd.DataFrame(donne)\n",
-    "DF= pd.concat([DF,Df], axis=0).reset_index(drop=True)\n",
-    "    return Df   \n",
-    "                                                        # PARTIE 3\n",
-    "\n",
-    "\n",
-    "def scrape_chaussures_data(plusieurs_page):\n",
-    "    df=pd.DataFrame()\n",
-    "    for p_index in range (1,int(plusieurs_page)+1):\n",
-    "        url= f'https://sn.coinafrique.com/categorie/chaussures-enfants?page={p_index}'\n",
-    "        res= get( url)\n",
-    "        soup= bs(res.text, 'html.parser')\n",
-    "        Paquets= soup.find_all('div', class_=\"col s6 m4 l3\")\n",
-    "        donne = []\n",
-    "for Paquet in Paquets:\n",
-    "    try :\n",
-    "        \n",
-    "        Type_chaussures=Paquet.find(\"p\", class_=\"ad__card-description\").text.strip()\n",
-    "        Prix=Paquet.find(\"p\",class_=\"ad__card-price\").text.strip().replace(\"CFA\", \"\")\n",
-    "        Adresse=Paquet.find(\"p\", class_=\"ad__card-location\").text.replace(\"location_on\", \"\")\n",
-    "        Image_lien=Paquet.find(\"img\", class_=\"ad__card-img\")[\"src\"]\n",
-    "        dic= {\n",
-    "            \"Type chaussure\":Type_chaussures,\n",
-    "            \"Prix\": Prix,\n",
-    "            \"Adresse\": Adresse,\n",
-    "            \"Image lien\":Image_lien,\n",
-    "        }\n",
-    "        data.append(dic)\n",
-    "    except :\n",
-    "          pass\n",
-    "DF1=pd.DataFrame(data)\n",
-    "df= pd.concat([df,DF1], axis=0).reset_index(drop=True)\n",
-    "\n",
-    "    return df   \n",
-    "                                                        # PARTIE 4\n",
-    "\n",
-    "st.sidebar.header(\"Saisie de l'utilisateur\")\n",
-    "Pages = st.sidebar.selectbox('Pages', list([int(p) for p in np.arange(2, 30)]))\n",
-    "Category = st.sidebar.selectbox(\"Options\", [\"Scrape les données avec beautifulSoup\", \"Scarper les données avec web Scarper\",  \"Formulaire avec koblox\", \"Formulaire avec Google Forms\"])\n",
-    "\n",
-    "# Fonction pour injecter du CSS personnalisé\n",
-    "def local_css(css):\n",
-    "    st.markdown(f\"<style>{css}</style>\", unsafe_allow_html=True)\n",
-    "\n",
-    "# CSS personnalisé\n",
-    "couleur_css = \"\"\"\n",
-    "    body {\n",
-    "        font-family: Arial, sans-serif;\n",
-    "        background-color: #f0f2f6;\n",
-    "    }\n",
-    "    h1 {\n",
-    "        color: #4a90e2;\n",
-    "        text-align: center;\n",
-    "    }\n",
-    "    .stButton button {\n",
-    "        background-color: #4a90e2;\n",
-    "        color: white;\n",
-    "        border-radius: 5px;\n",
-    "        padding: 10px 20px;\n",
-    "        border: none;\n",
-    "        cursor: pointer;\n",
-    "    }\n",
-    "    .stButton button:hover {\n",
-    "        background-color: #357abd;\n",
-    "    }\n",
-    "\"\"\"\n",
-    "# Appeler la fonction pour appliquer le CSS\n",
-    "local_css(couleur_css)\n",
-    " \n",
-    "\n",
-    "if Choices==\"Scrape les données avec beautifulSoup\":\n",
-    "\n",
-    "    Vetements_enfants = scrape_vetements_data(Pages)\n",
-    "    Chaussures_enfants = scrape_chaussures_data(Pages)\n",
-    "    \n",
-    "    load(Vetements_enfants, \"Données sur les vetements\", '1', '110')\n",
-    "    load(Chaussures_enfants, \"Données sur les chaussures\", '2', '111')\n",
-    "\n",
-    "elif Choices == \"Scarper les données avec web Scarber\": \n",
-    "    Vetements = pd.read_csv(\"Vetements_enfants.csv\")\n",
-    "    Chaussures = pd.read_csv(\"chaussure_enfants (1).csv\") \n",
-    "\n",
-    "    load(Vehicles, 'Vehicles data', '1', '110')\n",
-    "    load(Motocycles, 'Motocycles data', '2', '111')\n",
-    "\n",
-    "     \n",
-    "\n",
-    "\n",
-    "else :\n",
-    "    components.html(\"\"\"\n",
-    "    <iframe src=\"https://ee.kobotoolbox.org/x/lWB14KiL\" width=\"800\" height=\"1100\"></iframe>\n",
-    "    <iframe src=\"https://docs.google.com/forms/d/e/1FAIpQLScuuEKdEs1FmIeYDq3TrUT2TiNqc1OIT7GPG0hCa2fx52_q_A/viewform?usp=preview\"></iframe>\n",
-    "    \"\"\",height=1100,width=800)\n",
-    "\n",
-    "\n",
-    "\n",
-    "\n",
-    "\n",
-    "\n",
-    "\n",
-    " \n",
-    "\n"
-   ]
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python 3 (ipykernel)",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.13.1"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
+
+    import streamlit as st
+    import pandas as pd
+    from bs4 import BeautifulSoup as bs
+    from requests import get
+    import base64
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import numpy as np
+    import streamlit as st
+    import streamlit.components.v1 as components
+    
+    
+    
+    
+    st.markdown(<h1 style='text-align: center; color: black;'>SCARPER LES DONNEES</h1>, unsafe_allow_html=True)
+    
+    st.markdown("""
+    Cette application effectue le webscraping des données de Coin Afrique sur plusieurs pages. 
+    Et nous pouvons également télécharger les données extraites de l application directement sans les extraire. 
+    * **Bibliothèques Python :** base64, pandas, streamlit, requests, bs4 
+    * **Source des données :** https://sn.coinafrique.com/categorie/vetements-enfants --https://sn.coinafrique.com/categorie/chaussures-enfants.""")
+
+                                                          #PARTIE 1
+              # Fontion du background
+    def add_bg_from_local(image_file):
+       with open(image_file, \"rb\") as mage_file:
+            encoded_string = base64.b64encode(image_file.read())
+        st.markdown(
+    
+        <style>
+        .stApp {{
+            background-image: url(data:image/{"webp"};base64,{encoded_string.decode()});
+            background-size: cover
+            }}
+        </style>
+
+        unsafe_allow_html=True
+    
+             # fond d'ecran de l'application
+    add_bg_from_local("Fondecran.webp")
+             # Scarper les données 
+    @st.cache_data
+    
+    def convert_df(df):
+    
+        return df.to_csv().encode('utf-8')
+    
+    def load(dataframe, title, key, key1) :
+        st.markdown(
+        <style>
+        div.stButton {text-align:center}
+        </style>, unsafe_allow_html=True)
+    
+        if st.button(title,key1):
+            
+             st.subheader("Dimension") 
+             st.write("Dimension des données:" + str(dataframe.shape[0]) +  rows and  + str(dataframe.shape[1]) + " columns.")
+             st.dataframe(dataframe)
+    
+            csv = convert_df(dataframe)
+    
+            st.download_button(
+                label="Télécharger les données en CSV"
+                data=csv,
+                file_name='Données.csv',
+                mime='text/csv',
+                key = key)
+    
+   # def local_css(file_name):
+        #with open(file_name) as f:
+            #st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+    
+                                                                 # PARTIE 2 
+            
+                     # Fonction de scraping des données vetements des enfants
+    def scrape_vetements_data(plusieurs_page):
+        DF=pd.DataFrame()\
+        for index in range(1, int(plusieurs_page)+1): 
+            url=f'https://sn.coinafrique.com/categorie/vetements-enfants?page={index}'
+            res= get(url)
+            soup= bs(res.text, 'html.parser')
+            containers= soup.find_all('div', class_="col s6 m4 l3")
+            donne = []
+    for container in containers :
+        try :
+             type_habits=container.find(\"p", class_="ad__card-description").text.strip()
+             Prix=container.find("p", class_="ad__card-price").text.strip().replace("CFA", "" )
+             Adresse=container.find("p", class_="ad__card-location").text.strip().replace("location_on", "")
+             Image_lien=container.find("img",class_="ad__card-img")["src"]
+            
+             dic = {
+                    "Type habits": type_habits,
+                    "Prix": Prix,
+                    "Adresse": Adresse,
+                    "Image_lien": Image_lien,  
+                }
+             donne.append(dic)
+        except :
+               pass
+    Df=pd.DataFrame(donne)
+    DF= pd.concat([DF,Df], axis=0).reset_index(drop=True)
+        return Df   
+                                                            # PARTIE 3
+    
+    def scrape_chaussures_data(plusieurs_page):
+        df=pd.DataFrame()
+        for p_index in range (1,int(plusieurs_page)+1):
+            url= f'https://sn.coinafrique.com/categorie/chaussures-enfants?page={p_index}'
+            res= get( url)
+            soup= bs(res.text, 'html.parser')
+            Paquets= soup.find_all('div', class_="col s6 m4 l3")
+            donne = []
+    for Paquet in Paquets:
+        try :
+            
+            Type_chaussures=Paquet.find("p", class_="ad__card-description").text.strip()
+            Prix=Paquet.find("p",class_="ad__card-price").text.strip().replace("CFA", "")
+            Adresse=Paquet.find("p", class_="ad__card-location").text.replace("location_on", "")
+            Image_lien=Paquet.find("img", class_="ad__card-img")["src"]
+            dic= {
+                "Type chaussure":Type_chaussures,
+                "Prix": Prix,
+                "Adresse": Adresse,
+                "Image lien":Image_lien,
+            }
+            data.append(dic)
+       except :
+              pass
+    DF1=pd.DataFrame(data)
+    df= pd.concat([df,DF1], axis=0).reset_index(drop=True)
+
+        return df   
+                                                            # PARTIE 4
+    
+    st.sidebar.header("Saisie de l'utilisateur")
+    Pages = st.sidebar.selectbox('Pages', list([int(p) for p in np.arange(2, 30)]))
+    Category = st.sidebar.selectbox("Options", ["Scrape les données avec beautifulSoup", "Scarper les données avec web Scarper" , "Formulaire avec koblox", "Formulaire avec Google Forms"])
+    
+    # Fonction pour injecter du CSS personnalisé
+    def local_css(css):\
+        st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+    
+    # CSS personnalisé
+    couleur_css = 
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f6;
+        }
+        h1 {
+            color: #4a90e2;
+            text-align: center;
+          }
+        .stButton button {
+            background-color: #4a90e2;
+            color: white;
+            border-radius: 5px;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        .stButton button:hover {
+            background-color: #357abd;
+        }\
+    
+    # Appeler la fonction pour appliquer le CSS
+    local_css(couleur_css)
+
+    
+    if Category=="Scrape les données avec beautifulSoup":
+    
+        Vetements_enfants = scrape_vetements_data(Pages)
+        Chaussures_enfants = scrape_chaussures_data(Pages)
+        
+        load(Vetements_enfants, "Données sur les vetements", '1', '110')
+        load(Chaussures_enfants, "Données sur les chaussures", '2', '111')
+    
+    elif Choices == "Scarper les données avec web Scarber": 
+        Vetements = pd.read_csv("Vetements_enfants.csv")
+        Chaussures = pd.read_csv("chaussure_enfants (1).csv") 
+    
+        load(Vehicles, 'Vehicles data', '1', '110')
+        load(Motocycles, 'Motocycles data', '2', '111')
+    
+    
+    
+    
+    else :
+        components.html("""
+        <iframe src="https://ee.kobotoolbox.org/x/lWB14KiL" width="800" height="1100"></iframe>,
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScuuEKdEs1FmIeYDq3TrUT2TiNqc1OIT7GPG0hCa2fx52_q_A/viewform?usp=preview"></iframe>
+        """,height=1100,width=800)
+ 
