@@ -27,7 +27,7 @@ def add_bg_from_local(image_file):
         background-image: url(data:image/webp;base64,{encoded_string.decode()});
         background-size: cover;
         background-color: #000000; /* Noir */
-        color: #ffffff; /* Blanc */
+        color: #000000; /* Noir */
     }}
     
     .stMarkdown, .stTextInput, .stButton>button {{
