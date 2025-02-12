@@ -168,15 +168,18 @@ if Category == "Scrape les données avec beautifulSoup":
     load(Vetements_enfants, "Données sur les vetements", '1', '110')
     load(Chaussures_enfants, "Données sur les chaussures", '2', '111')
 
-elif Category == "Scarper les données avec web Scarber":
-    Vetements = pd.read_csv("Vetements_enfants.csv")
-    Chaussures = pd.read_csv("chaussure_enfants (1).csv")
-    
-    load(Vetements, "Données sur les vetements", '1', '110')
-    load(Chaussures, "Données sur les chaussures", '2', '111')
-
-else:
-    components.html("""
-    <iframe src="https://ee.kobotoolbox.org/x/lWB14KiL" width="800" height="1100"></iframe>
-    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScuuEKdEs1FmIeYDq3TrUT2TiNqc1OIT7GPG0hCa2fx52_q_A/viewform?usp=preview" width="800" height="1100"></iframe>
-    """, height=1100, width=800)
+elif Category == "Scraper les données avec web Scraper":
+    try:
+        Vetements = pd.read_csv("Vetements_enfants.csv")
+        Chaussures = pd.read_csv("Chaussures_enfants.csv")
+        
+        load(Vetements, "Données sur les vetements", '1', '110')
+        load(Chaussures, "Données sur les chaussures", '2', '111')
+    except FileNotFoundError as e:
+        print(f"Erreur: Fichier non trouvé - {e}")
+    except Exception as e:
+        print(f"Erreur inattendue: {e}")
+components.html("""
+<iframe src="https://kf.kobotoolbox.org/#/forms/aHfeV2YQC7YodLce47Bav5" width="800" height="1100"></iframe>
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLScuuEKdEs1FmIeYDq3TrUT2TiNqc1OIT7GPG0hCa2fx52_q_A/viewform?usp=preview" width="800" height="1100"></iframe>
+""")
