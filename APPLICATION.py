@@ -26,17 +26,17 @@ def add_bg_from_local(image_file):
     .stApp {{
         background-image: url(data:image/webp;base64,{encoded_string.decode()});
         background-size: cover;
-        background-color: #f5e6dc; /* Beige pastel doux */
-        color: #d17842; /* Brun orangé inspiré des chaussures et vêtements */
+        background-color: #000000; /* Noir */
+        color: #ffffff; /* Blanc */
     }}
     
     .stMarkdown, .stTextInput, .stButton>button {{
-        color: #d17842;
+        color: #ffffff;
         font-family: 'Poppins', sans-serif;
     }}
     
     .stButton>button {{
-        background-color: #ffab73; /* Orange doux */
+        background-color: #333333; /* Gris foncé */
         border-radius: 10px;
         border: none;
         padding: 8px 15px;
@@ -44,9 +44,10 @@ def add_bg_from_local(image_file):
     }}
     
     .stButton>button:hover {{
-        background-color: #e67e22; /* Orange plus vif au survol */
+        background-color: #555555; /* Gris plus clair au survol */
     }}
 </style>
+
     """,
     unsafe_allow_html=True
 )
