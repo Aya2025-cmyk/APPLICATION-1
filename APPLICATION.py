@@ -54,7 +54,7 @@ def add_bg_from_local(image_file):
 
 
 # Fond d'écran de l'application
-add_bg_from_local("enfants.webp")
+add_bg_from_local("mor.webp")
 
 # Fonction pour convertir un DataFrame en CSV
 @st.cache_data
