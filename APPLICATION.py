@@ -24,7 +24,7 @@ def add_bg_from_local(image_file):
     f"""
    <style>
     .stApp {{
-        background-image: url(data:image/png;base64,{encoded_string.decode()});
+        background-image: url(data:image/webp;base64,{encoded_string.decode()});
         background-size: cover;
         background-color: #f5e6dc; /* Beige pastel doux */
         color: #d17842; /* Brun orangé inspiré des chaussures et vêtements */
@@ -53,7 +53,7 @@ def add_bg_from_local(image_file):
 
 
 # Fond d'écran de l'application
-add_bg_from_local("enfants.png")
+add_bg_from_local("enfants.webp")
 
 # Fonction pour convertir un DataFrame en CSV
 @st.cache_data
