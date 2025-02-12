@@ -21,19 +21,25 @@ def add_bg_from_local(image_file):
     with open(image_file, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read())
     st.markdown(
-        f"""
-        <style>
-        .stApp {{
-            background-image: url(data:image/webp;base64,{encoded_string.decode()});
-            background-size: cover;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+    f"""
+    <style>
+    .stApp {{
+        background-image: url(data:image/webp;base64,{encoded_string.decode()});
+        background-size: cover;
+        background-color: #0a0a1e; /* Bleu nuit */
+        color: #00d4ff; /* Bleu néon */
+    }}
+    .stMarkdown, .stTextInput, .stButton>button {{
+        color: #00d4ff;
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # Fond d'écran de l'application
-add_bg_from_local("Fondecran.webp")
+add_bg_from_local("aya.webp")
 
 # Fonction pour convertir un DataFrame en CSV
 @st.cache_data
@@ -135,25 +141,39 @@ def local_css(css):
 
 # CSS personnalisé
 couleur_css = """
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f2f6;
-    }
-    h1 {
-        color: #4a90e2;
-        text-align: center;
-    }
-    .stButton button {
-        background-color: #4a90e2;
-        color: white;
-        border-radius: 5px;
-        padding: 10px 20px;
-        border: none;
-        cursor: pointer;
-    }
-    .stButton button:hover {
-        background-color: #357abd;
-    }
+   body {
+    font-family: Arial, sans-serif;
+    background-color: #0a0f1e;
+    background-image: url('C:\Users\user\Downloads\aya.webp'); 
+    background-size: cover;
+    background-position: center;
+    color: #d4e0fc;
+}
+
+h1 {
+    color: #00d9ff;
+    text-align: center;
+    text-shadow: 0px 0px 10px #00d9ff;
+}
+
+.stButton button {
+    background-color: #002b5b;
+    color: #00d9ff;
+    border-radius: 8px;
+    padding: 12px 25px;
+    border: 2px solid #00d9ff;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0px 0px 10px #00d9ff;
+    transition: all 0.3s ease-in-out;
+}
+
+.stButton button:hover {
+    background-color: #003f7f;
+    box-shadow: 0px 0px 20px #00d9ff;
+    transform: scale(1.05);
+}
 """
 
 # Appeler la fonction pour appliquer le CSS
